@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -27,22 +28,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   bool isPertalite = true;
   late AnimationController _controller;
   late Animation<double> _animation;
+  Color buttonColor = Colors.redAccent.shade700;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
-    )..addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _controller.reverse();
-      } else if (status == AnimationStatus.dismissed) {
-        _controller.forward();
-      }
-    });
+      duration: const Duration(milliseconds: 500),
+    )..repeat(reverse: true);
 
-    _animation = Tween<double>(begin: -0.1, end: 0.1).animate(_controller);
+    _animation = Tween<double>(begin: -0.08, end: 0.08).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -52,19 +50,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void _handleTap() {
-    _controller.forward(); // Mulai animasi goyangan
-
-    Future.delayed(const Duration(seconds: 2), () {
-      _controller.stop(); // Hentikan goyangan lebih dulu
+    _controller.stop();
+    Future.delayed(const Duration(milliseconds: 100), () {
       setState(() {
-        isPertalite = false; // Ganti ke gambar kedua
+        isPertalite = !isPertalite;
+        buttonColor = isPertalite ? Colors.redAccent.shade700 : Colors.blueAccent; // Ubah warna tombol
       });
-    });
-
-    Future.delayed(const Duration(seconds: 3), () {
-      setState(() {
-        isPertalite = true; // Kembali ke gambar pertama setelah 3 detik
-      });
+      _controller.repeat(reverse: true);
     });
   }
 
@@ -72,43 +64,33 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              "Aku Pengoplos Handal",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(width: 8), // Jarak antara teks dan emoji
-            const Text(
-              "💸", // Emoji uang
-              style: TextStyle(fontSize: 20), // Sesuaikan ukuran emoji
-            ),
-          ],
+        title: Text(
+          "Aku Pengoplos Handal 💸",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         centerTitle: true,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.redAccent.shade700,
+        elevation: 10,
       ),
-
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage("assets/spbu.jpg"), // Gambar latar belakang
+            image: AssetImage("assets/spbu.jpg"),
             fit: BoxFit.cover,
           ),
         ),
         child: Center(
           child: Container(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(25),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5), // Warna putih transparan agar lebih menyatu
-              borderRadius: BorderRadius.circular(15),
+              color: Colors.white.withOpacity(0.85),
+              borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  spreadRadius: 3,
-                  blurRadius: 7,
-                  offset: const Offset(0, 5), // Efek bayangan agar menonjol
+                  color: Colors.black.withOpacity(0.3),
+                  spreadRadius: 2,
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
@@ -119,94 +101,78 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   animation: _controller,
                   builder: (context, child) {
                     return Transform.rotate(
-                      angle: isPertalite ? _animation.value : 0, // Goyang hanya saat gambar pertama
+                      angle: _animation.value,
                       child: child,
                     );
                   },
                   child: Image.asset(
                     isPertalite ? "assets/pertalite.png" : "assets/pertamax.png",
-                    width: 300,
-                    height: 300,
-                    fit: BoxFit.cover,
+                    width: 250,
+                    height: 250,
                   ),
                 ),
-
                 const SizedBox(height: 20),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Row(
-                      children: [
-                        Text("🚗", style: TextStyle(fontSize: 18)), // Ikon di kiri
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            "Mobil batuk-batuk? Itu bukan masalah kita",
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Text("💰", style: TextStyle(fontSize: 18)),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            "Yang penting cuan lancar, customer? Ah, bodo amat",
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Text("😁", style: TextStyle(fontSize: 18)),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            "Harga naik terus, kualitas? Rahasia perusahaan",
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Text("🧏‍♂️", style: TextStyle(fontSize: 18)),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            "Customer tau? Tenang, kita pura-pura budek aja",
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black),
-                          ),
-                        ),
-                      ],
-                    ),
+                  children: [
+                    _buildTextRow("🚗", "Mobil batuk-batuk? Itu bukan masalah kita."),
+                    _buildTextRow("💰", "Yang penting cuan lancar, customer? Ah, bodo amat."),
+                    _buildTextRow("😁", "Harga naik terus, kualitas? Rahasia perusahaan."),
+                    _buildTextRow("🧏‍♂", "Customer tau? Tenang, kita pura-pura budek aja."),
                   ],
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _handleTap,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white.withOpacity(0.5), // Tombol putih
-                    foregroundColor: Colors.black, // Teks hitam
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      side: const BorderSide(color: Colors.black, width: 2), // Outline hitam
+                    backgroundColor: buttonColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                    textStyle: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(color: Colors.black, width: 2),
+                    ),
+                    shadowColor: Colors.black,
+                    elevation: 10,
                   ),
-                  child: const Text("Ketuk untuk mengoplos"),
+                  child: const Text("Ketuk Untuk Mengoplos"),
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildTextRow(String emoji, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            emoji,
+            style: const TextStyle(fontSize: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.5,
+                height: 1.6,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
